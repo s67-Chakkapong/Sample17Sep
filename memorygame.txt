@@ -1,4 +1,8 @@
 int[][] grid;
+boolean[][] revealed;
+int rows = 3;
+int cols = 4;
+int w, h;
 
 void setup() {
     size(500, 500);
@@ -6,48 +10,56 @@ void setup() {
     textAlign(CENTER, CENTER); 
     background(255);
     
-    grid = generateGrid(3, 4); 
-    
-    int rows = grid.length;
-    int cols = grid[0].length;
-    
-    int w = width / cols;
-    int h = height / rows;
+    grid = generateGrid(rows, cols); 
+    revealed = new boolean[rows][cols];
+
+    w = width / cols;
+    h = height / rows;
 
     draw_grid(rows, cols, w, h); 
-    
-    int i = 0;
-    while (i < rows) {
-        int j = 0;
-        while (j < cols) {
+}
+
+void draw() {
+    background(255);
+    draw_grid(rows, cols, w, h);
+    draw_numbers(); 
+}
+
+void draw_numbers() {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             int x = j * w + w / 2; 
             int y = i * h + h / 2; 
-            int n = grid[i][j];
-            
-            draw_number(x, y, n);
-
-            j++;
+            if (revealed[i][j]) {
+                draw_number(x, y, grid[i][j]);
+            }
         }
-        i++;
     }
 }
+
+void mousePressed() {
+    int j = mouseX / w;
+    int i = mouseY / h;
+    
+    
+    revealed[i][j] = true; 
+        
+}
+
 
 void draw_number(int x, int y, int n) {
     fill(0); 
     text(n, x, y); 
 }
 
-
 void draw_grid(int rows, int cols, int w, int h) {
     stroke(0);  
     strokeWeight(2); 
-    
-  
+
     for (int i = 1; i < cols; i++) {
         line(i * w, 0, i * w, height);
     }
-    
-   
+
     for (int i = 1; i < rows; i++) {
         line(0, i * h, width, i * h);
     }
@@ -82,6 +94,5 @@ void shuffle(int[] array) {
         
         array[i] = array[j];
         array[j] = temp;
-        println(i,j);
     }
 }
