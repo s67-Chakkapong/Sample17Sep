@@ -1,36 +1,51 @@
 int[][] grid;
 boolean[][] revealed;
+boolean[][] matched;  
 int rows = 3;
 int cols = 4;
 int w, h;
 
+int[] firstClick = {-1, -1}; 
+int[] secondClick = {-1, -1}; 
+boolean isChecking = false;
+int revealTime = 1000; 
+int lastClickTime = 0;
+
 void setup() {
     size(500, 500);
     textSize(32);
-    textAlign(CENTER, CENTER); 
+    textAlign(CENTER, CENTER);
     background(255);
     
-    grid = generateGrid(rows, cols); 
+    grid = generateGrid(rows, cols);
     revealed = new boolean[rows][cols];
+    matched = new boolean[rows][cols];
 
     w = width / cols;
     h = height / rows;
 
-    draw_grid(rows, cols, w, h); 
+    draw_grid(rows, cols, w, h);
 }
 
 void draw() {
     background(255);
     draw_grid(rows, cols, w, h);
-    draw_numbers(); 
+    draw_numbers();
+
+ 
+    if (isChecking && millis() - lastClickTime >= revealTime) {
+        checkMatch();
+    }
 }
 
 void draw_numbers() {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             int x = j * w + w / 2; 
-            int y = i * h + h / 2; 
-            if (revealed[i][j]) {
+            int y = i * h + h / 2;
+            
+         
+            if (revealed[i][j] || matched[i][j]) {
                 draw_number(x, y, grid[i][j]);
             }
         }
@@ -40,12 +55,44 @@ void draw_numbers() {
 void mousePressed() {
     int j = mouseX / w;
     int i = mouseY / h;
-    
-    
-    revealed[i][j] = true; 
-        
+
+    if (i >= rows || j >= cols || matched[i][j] || revealed[i][j] || isChecking) return;  
+
+    if (firstClick[0] == -1) {
+
+        firstClick[0] = i;
+        firstClick[1] = j;
+        revealed[i][j] = true;
+    } else if (secondClick[0] == -1 && (i != firstClick[0] || j != firstClick[1])) {
+   
+        secondClick[0] = i;
+        secondClick[1] = j;
+        revealed[i][j] = true;
+        isChecking = true;
+        lastClickTime = millis(); 
+    }
 }
 
+void checkMatch() {
+    int i1 = firstClick[0], j1 = firstClick[1];
+    int i2 = secondClick[0], j2 = secondClick[1];
+
+
+    if (grid[i1][j1] == grid[i2][j2]) {
+        matched[i1][j1] = true;
+        matched[i2][j2] = true;
+    } else {
+        revealed[i1][j1] = false;
+        revealed[i2][j2] = false;
+    }
+
+    
+    firstClick[0] = -1;
+    firstClick[1] = -1;
+    secondClick[0] = -1;
+    secondClick[1] = -1;
+    isChecking = false;
+}
 
 void draw_number(int x, int y, int n) {
     fill(0); 
@@ -53,8 +100,8 @@ void draw_number(int x, int y, int n) {
 }
 
 void draw_grid(int rows, int cols, int w, int h) {
-    stroke(0);  
-    strokeWeight(2); 
+    stroke(0);
+    strokeWeight(2);
 
     for (int i = 1; i < cols; i++) {
         line(i * w, 0, i * w, height);
@@ -91,7 +138,6 @@ void shuffle(int[] array) {
     for (int i = array.length - 1; i > 0; i--) {
         int j = (int)random(i + 1);
         int temp = array[i];
-        
         array[i] = array[j];
         array[j] = temp;
     }
