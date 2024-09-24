@@ -1,0 +1,59 @@
+int[][] grid;
+
+void setup() {
+    size(500, 500);
+    textSize(32);
+    textAlign(CENTER, CENTER); 
+    background(255);
+    
+    grid = generateGrid(3, 4); 
+    
+    int rows = grid.length;
+    int cols = grid[0].length;
+    
+    int w = width / cols;
+    int h = height / rows;
+    
+    int i = 0;
+    while (i < rows) {
+        int j = 0;
+        while (j < cols) {
+            int x = j * w + w / 2; 
+            int y = i * h + h / 2; 
+            int n = grid[i][j];
+            
+            draw_number(x, y, n);
+
+            j++;
+        }
+        i++;
+    }
+}
+
+void draw_number(int x, int y, int n) {
+    fill(0); 
+    text(n, x, y); 
+}
+
+int[][] generateGrid(int rows, int cols) {
+    int[] numbers = new int[rows * cols];
+    
+    
+    int index = 0;
+    for (int i = 1; i <= 6; i++) {
+        numbers[index++] = i;
+        numbers[index++] = i;
+    }
+
+
+    
+    int[][] grid = new int[rows][cols];
+    index = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            grid[i][j] = numbers[index++];
+        }
+    }
+    
+    return grid;
+}
